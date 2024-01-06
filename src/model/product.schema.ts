@@ -1,30 +1,38 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 
-export const ProductSchema = new mongoose.Schema({
-  name: String,
-  price: Number,
-  description: String,
-  category: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
-    },
-  ],
-  createdAt: Date,
-  updatedAt: Date,
-  deletedAt: Date,
-  quantity: Number,
-  image: String,
-});
-
-export interface Product extends Document {
+@Schema({
+  timestamps: true,
+})
+export class Product {
+  @Prop()
   name: string;
+
+  @Prop()
   price: number;
+
+  @Prop()
   description: string;
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }] })
   category: string[];
+
+  @Prop({ type: Date, default: Date.now })
   createdAt: Date;
+
+  @Prop({ type: Date, default: Date.now })
   updatedAt: Date;
+
+  @Prop({ type: Date, default: null })
   deletedAt: Date;
-  image: string;
+
+  @Prop()
   quantity: number;
+
+  @Prop()
+  image: string;
 }
+
+export const ProductSchema = SchemaFactory.createForClass(Product);
+
+export interface ProductDocument extends Product, Document {}

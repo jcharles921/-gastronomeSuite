@@ -1,23 +1,24 @@
-import { Controller, Post, Get, Put, Delete } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete,Body,ValidationPipe ,Param} from '@nestjs/common';
 import { ApiTags,ApiOperation,ApiResponse} from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { ProductDto } from 'src/dto';
 
 @Controller('product')
+@ApiTags('Product')
 export class ProductController {
     constructor(private productService: ProductService) {}
 
-    @Post('create')
+    @Post()
     @ApiOperation({ summary: 'Create a new product' })
     @ApiResponse({
       status: 201,
       description: 'The product has been successfully created.',
     })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
-    async createProduct(productInfo: ProductDto) {
+    async createProduct( @Body(ValidationPipe) productInfo: ProductDto) {
       return await this.productService.createProduct(productInfo);
     }
-    @Get('all')
+    @Get()
     @ApiOperation({ summary: 'Get all products' })
     @ApiResponse({
       status: 201,
@@ -27,34 +28,34 @@ export class ProductController {
     async getAllProducts() {
       return await this.productService.getAllProducts();
     }
-    @Get('single/:id')
+    @Get('/:id')
     @ApiOperation({ summary: 'Get a single product' })
     @ApiResponse({
       status: 201,
       description: 'The product has been successfully retrieved.',
     })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
-    async getSingleProduct(id: string) {
+    async getSingleProduct(@Param('id') id: string) {
       return await this.productService.getSingleProduct(id);
     }
-    @Put('update/:id')
+    @Put('/:id')
     @ApiOperation({ summary: 'Update a product' })
     @ApiResponse({
       status: 201,
       description: 'The product has been successfully updated.',
     })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
-    async updateProduct(id: string, productInfo: ProductDto) {
+    async updateProduct( @Body(ValidationPipe) productInfo: ProductDto,@Param('id') id: string,) {
       return await this.productService.updateProduct(id, productInfo);
     }
-    @Delete('delete/:id')
+    @Delete('/:id')
     @ApiOperation({ summary: 'Delete a product' })
     @ApiResponse({
       status: 201,
       description: 'The product has been successfully deleted.',
     })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
-    async deleteProduct(id: string) {
+    async deleteProduct( @Param('id')  id: string) {
       return await this.productService.deleteProduct(id);
     }
 }
