@@ -1,14 +1,23 @@
-import mongoose, { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-export const CategorySchema = new mongoose.Schema({
-  name: String,
-  createdAt: Date,
-  updatedAt: Date,
-  deletedAt: Date,
-});
-export interface Category extends Document {
+@Schema({
+  timestamps: true,
+})
+export class Category {
+  @Prop()
   name: string;
+
+  @Prop({ type: Date, default: Date.now })
   createdAt: Date;
+
+  @Prop({ type: Date, default: Date.now })
   updatedAt: Date;
+
+  @Prop({ type: Date, default: null })
   deletedAt: Date;
 }
+
+export const CategorySchema = SchemaFactory.createForClass(Category);
+
+export interface CategoryDocument extends Category, Document {}

@@ -14,6 +14,5 @@ export class SignUpDto {
   @MinLength(6)
   password: string;
   @ApiProperty({ description: 'Type of user', type: String })
-  @IsNotEmpty()
   role: number;
 }

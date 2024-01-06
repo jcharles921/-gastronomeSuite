@@ -1,33 +1,41 @@
-import mongoose, { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
-export const ExpenseSchema = new mongoose.Schema({
-  name: String,
-  price: Number,
-  description: String,
-  type: String,
-  product: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-    },
-  ],
-  createdAt: Date,
-  updatedAt: Date,
-  deletedAt: Date,
-  total: Number,
-});
-
-export interface Expense extends Document {
+@Schema({
+  timestamps: true,
+})
+export class Expense {
+  @Prop()
   name: string;
+
+  @Prop()
   price: number;
+
+  @Prop()
   description: string;
-  type: {
-    type: string;
-    enum: ['Herbergement', 'Transport', 'Restauration', 'Autres'];
-  };
+
+  @Prop({
+    type: String,
+    enum: ['Herbergement', 'Transport', 'Restauration', 'Autres'],
+  })
+  type: string;
+
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Product' }] })
   product: string[];
+
+  @Prop({ type: Date, default: Date.now })
   createdAt: Date;
+
+  @Prop({ type: Date, default: Date.now })
   updatedAt: Date;
+
+  @Prop({ type: Date, default: null })
   deletedAt: Date;
+
+  @Prop()
   total: number;
 }
+
+export const ExpenseSchema = SchemaFactory.createForClass(Expense);
+
+export interface ExpenseDocument extends Expense, Document {}
