@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+// import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 export const orderSchema = new mongoose.Schema({
   id: Number,
@@ -7,6 +7,7 @@ export const orderSchema = new mongoose.Schema({
   category: String,
   createdAt: Date,
   updatedAt: Date,
+  clientName: String,
   deletedAt: Date,
   status: String,
   user: {
@@ -31,6 +32,7 @@ export interface Order extends Document {
   description: string;
   category: string;
   createdAt: Date;
+  clientName: string;
   updatedAt: Date;
   deletedAt: Date;
   status: string;

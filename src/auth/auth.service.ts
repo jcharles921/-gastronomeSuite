@@ -1,12 +1,13 @@
 import {
   Injectable,
   ConflictException,
+
   BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/model';
-import { SignUpDto,LoginDto } from 'src/dto';
+import { SignUpDto, LoginDto } from 'src/dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
@@ -25,7 +26,7 @@ export class AuthService {
       if (user) {
         throw new ConflictException('Email already exists');
       }
-  
+
       const hashedPassword = await bcrypt.hash(password, 10);
       const usersCount = await this.userModel.countDocuments({});
       const userRole = usersCount === 0 ? 1 : 2;
@@ -45,7 +46,6 @@ export class AuthService {
           email,
           password: hashedPassword,
           role: userRole,
-          
         });
         const token = this.jwtService.sign({ id: user._id });
         return { token, message: 'User created successfully', user };
@@ -54,25 +54,25 @@ export class AuthService {
       throw new BadRequestException(error.message);
     }
   }
-  async signIn(loginInfo:LoginDto): Promise<{token: string; message: string; user: any }> {
+  async signIn(
+    loginInfo: LoginDto,
+  ): Promise<{ token: string; message: string; user: any }> {
     const { email, password } = loginInfo;
     try {
       const user = await this.userModel.findOne({ email });
-     
+
       if (!user) {
         throw new BadRequestException('Invalid credentials');
       }
       const isMatch = await bcrypt.compare(password, user.password);
-      if(isMatch){
+      if (isMatch) {
         const token = this.jwtService.sign({ id: user._id });
         return { token, message: 'User logged in successfully', user };
-      }
-      else{
+      } else {
         throw new BadRequestException('Invalid credentials');
       }
     } catch (error) {
       throw new BadRequestException(error.message);
     }
-
-}
+  }
 }

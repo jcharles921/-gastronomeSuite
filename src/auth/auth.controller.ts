@@ -10,8 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { JwtService } from '@nestjs/jwt';
-import { SignUpDto,LoginDto } from 'src/dto';
+import { SignUpDto, LoginDto } from 'src/dto';
 import * as cookie from 'cookie';
 import { Response } from 'express';
 
@@ -20,7 +19,6 @@ import { Response } from 'express';
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private jwtService: JwtService,
   ) {}
   @Post('signup')
   @ApiOperation({ summary: 'Create a new user' })
@@ -29,7 +27,10 @@ export class AuthController {
     description: 'The user has been successfully created.',
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  async signUp(@Body(ValidationPipe) signUpInfo: SignUpDto,@Res() res: Response) {
+  async signUp(
+    @Body(ValidationPipe) signUpInfo: SignUpDto,
+    @Res() res: Response,
+  ) {
     const response = await this.authService.signUp(signUpInfo);
     if (response.token) {
       res.cookie('token', response.token, { httpOnly: true });
@@ -43,12 +44,14 @@ export class AuthController {
     description: 'The user has been successfully logged in.',
   })
   @ApiResponse({ status: 403, description: 'Invalid Credentials' })
-  async signIn(@Body(ValidationPipe) loginInfo: LoginDto,@Res() res: Response) {
-    const response= await this.authService.signIn(loginInfo);
-    if(response.token){
-      res.cookie('token',response.token,{httpOnly:true});
+  async signIn(
+    @Body(ValidationPipe) loginInfo: LoginDto,
+    @Res() res: Response,
+  ) {
+    const response = await this.authService.signIn(loginInfo);
+    if (response.token) {
+      res.cookie('token', response.token, { httpOnly: true });
       return res.send(response);
     }
-
   }
 }
