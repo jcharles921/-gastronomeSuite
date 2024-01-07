@@ -37,6 +37,7 @@ export class AuthController {
       return res.send(response);
     }
   }
+  
   @Post('login')
   @ApiOperation({ summary: 'Login a user' })
   @ApiResponse({
