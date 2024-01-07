@@ -8,17 +8,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setDescription(' # Amicizia API')
     .setVersion('4.0')
-    .addBearerAuth(
-      {
-        description: `Please enter token`,
-        name: 'Authorization',
-        bearerFormat: 'Bearer',
-        scheme: 'Bearer',
-        type: 'http',
-        in: 'Header',
-      },
-      'jwt',
-    )
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);

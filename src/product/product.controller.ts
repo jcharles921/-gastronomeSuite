@@ -1,8 +1,9 @@
 import { Controller, Post, Get, Put, Delete,Body,ValidationPipe ,Param} from '@nestjs/common';
-import { ApiTags,ApiOperation,ApiResponse} from '@nestjs/swagger';
+import { ApiTags,ApiOperation,ApiResponse,ApiBearerAuth} from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { ProductDto } from 'src/dto';
 
+@ApiBearerAuth()
 @Controller('product')
 @ApiTags('Product')
 export class ProductController {
