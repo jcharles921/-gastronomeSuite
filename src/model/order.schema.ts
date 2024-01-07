@@ -5,17 +5,12 @@ import mongoose, { Document } from 'mongoose';
   timestamps: true,
 })
 export class Order {
-  @Prop()
-  id: string; 
-
+  
   @Prop()
   totalToBePaid: number;
 
   @Prop()
   description: string;
-
-  @Prop()
-  category: string;
 
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;
@@ -29,19 +24,24 @@ export class Order {
   @Prop({ type: Date, default: null })
   deletedAt: Date;
 
-  @Prop()
+  @Prop({
+    type: String,
+    enum: ['pending', 'paid', 'canceled'],
+  })
   status: string;
 
   @Prop({ type: mongoose.Types.ObjectId, ref: 'User' })
   user: string;
 
-  @Prop({ type: mongoose.Types.ObjectId, ref: 'Payment' })
-  payment: string;
-
-  @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'OrderDetail' }] })
-  orderDetails: string[];
+  @Prop([{
+    productId: { type: mongoose.Types.ObjectId, ref: 'Product' },
+    quantity: { type: Number, default: 1 }, 
+  }])
+  orderDetails: { productId: string; quantity: number }[];
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
-export interface OrderDocument extends Order, Document { id: string;}
+export interface OrderDocument extends Order, Document {
+  id: string;
+}

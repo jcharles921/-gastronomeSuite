@@ -1,7 +1,6 @@
 import {
   Injectable,
   ConflictException,
-
   BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -38,7 +37,7 @@ export class AuthService {
           password: hashedPassword,
           role: userRole,
         });
-        const token = this.jwtService.sign({ id: user._id });
+        const token = this.jwtService.sign({ id: user._id, role: userRole});
         return { token, message: 'User created successfully', user };
       } else {
         const user = await this.userModel.create({
@@ -47,7 +46,7 @@ export class AuthService {
           password: hashedPassword,
           role: userRole,
         });
-        const token = this.jwtService.sign({ id: user._id });
+        const token = this.jwtService.sign({ id: user._id, role: userRole });
         return { token, message: 'User created successfully', user };
       }
     } catch (error) {
@@ -66,7 +65,7 @@ export class AuthService {
       }
       const isMatch = await bcrypt.compare(password, user.password);
       if (isMatch) {
-        const token = this.jwtService.sign({ id: user._id });
+        const token = this.jwtService.sign({ id: user._id, role: user.role});
         return { token, message: 'User logged in successfully', user };
       } else {
         throw new BadRequestException('Invalid credentials');
