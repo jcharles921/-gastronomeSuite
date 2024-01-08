@@ -14,7 +14,10 @@ export class Product {
   @Prop()
   description: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }] })
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
+    default: null,
+  })
   category: string[];
 
   @Prop({ type: Date, default: Date.now })

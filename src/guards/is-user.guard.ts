@@ -17,10 +17,8 @@ export class IsUserGuard implements CanActivate {
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
-      
       const request = context.switchToHttp().getRequest();
       const token = this.extractTokenFromRequest(request);
-      
 
       if (!token) {
         throw new UnauthorizedException();
@@ -40,7 +38,6 @@ export class IsUserGuard implements CanActivate {
     }
   }
   private extractTokenFromRequest(request: Request): string {
-    
     const authorizationHeader =
       request.headers['authorization'] || request.headers['Authorized'];
     if (authorizationHeader) {
@@ -49,8 +46,7 @@ export class IsUserGuard implements CanActivate {
         return token;
       }
     }
-    const cookie = request.headers['cookie'];
-    console.log(cookie)
+    
     throw new UnauthorizedException();
   }
 }

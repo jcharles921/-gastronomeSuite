@@ -15,11 +15,9 @@ import * as cookie from 'cookie';
 import { Response } from 'express';
 
 @Controller('auth')
-@ApiTags('Authenrification')
+@ApiTags('Authentification')
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-  ) {}
+  constructor(private authService: AuthService) {}
   @Post('signup')
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({
@@ -37,7 +35,7 @@ export class AuthController {
       return res.send(response);
     }
   }
-  
+
   @Post('login')
   @ApiOperation({ summary: 'Login a user' })
   @ApiResponse({

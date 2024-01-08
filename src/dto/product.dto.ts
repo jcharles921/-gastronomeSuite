@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 // VALIDATION FOR PRODUCT
@@ -15,8 +15,7 @@ export class ProductDto {
 
   @ApiProperty({ description: 'The category of the product', type: String })
   @IsNotEmpty()
-
-  category:[];
+  category: [];
 
   @ApiProperty({ description: 'The quantity of the product', type: Number })
   @IsNotEmpty()
@@ -40,11 +39,9 @@ export class ProductUpdateDto {
   price: number;
 
   @ApiProperty({ description: 'The category of the product', type: String })
-
-  category:[];
+  category: [];
 
   @ApiProperty({ description: 'The quantity of the product', type: Number })
- 
   quantity: number;
 
   @ApiProperty({ description: 'The description of the product', type: String })

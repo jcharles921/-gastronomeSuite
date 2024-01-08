@@ -8,6 +8,9 @@ export class Category {
   @Prop()
   name: string;
 
+  @Prop()
+  inputationNumber: number;
+
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;
 
