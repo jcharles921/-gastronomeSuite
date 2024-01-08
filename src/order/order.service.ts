@@ -16,7 +16,10 @@ export class OrderService {
   async createOrder(orderInfo: OrderDto): Promise<Order> {
     const { clientName, totalToBePaid, status, orderDetails, user } = orderInfo;
     try {
-      const findOrder = await this.orderModel.findOne({ clientName, status: 'pending' });
+      const findOrder = await this.orderModel.findOne({
+        clientName,
+        status: 'pending',
+      });
       if (findOrder) {
         throw new ConflictException('Order already exists');
       }
@@ -53,7 +56,7 @@ export class OrderService {
     }
   }
   async updateOrder(id: string, orderInfo: OrderUpdateDto): Promise<Order> {
-    const { totalToBePaid, status, orderDetails, user,clientName } = orderInfo;
+    const { totalToBePaid, status, orderDetails, user, clientName } = orderInfo;
     try {
       const order = await this.orderModel.findById(id);
       if (!order) {

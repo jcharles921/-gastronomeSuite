@@ -46,7 +46,7 @@ export class IsUserGuard implements CanActivate {
         return token;
       }
     }
-    
+
     throw new UnauthorizedException();
   }
 }

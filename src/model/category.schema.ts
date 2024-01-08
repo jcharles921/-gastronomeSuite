@@ -7,16 +7,12 @@ import { Document } from 'mongoose';
 export class Category {
   @Prop()
   name: string;
-
   @Prop()
   inputationNumber: number;
-
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;
-
   @Prop({ type: Date, default: Date.now })
   updatedAt: Date;
-
   @Prop({ type: Date, default: null })
   deletedAt: Date;
 }

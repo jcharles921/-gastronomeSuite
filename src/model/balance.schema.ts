@@ -5,7 +5,10 @@ import mongoose, { Document } from 'mongoose';
   timestamps: true,
 })
 export class Balance {
-  @Prop()
+  @Prop({
+    type: Number,
+    default: 0,
+  })
   total: number;
 
   @Prop()
@@ -19,9 +22,8 @@ export class Balance {
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;
 
-  @Prop()
-  clientName: string;
-
   @Prop({ type: Date, default: Date.now })
   updatedAt: Date;
 }
+
+export const BalanceSchema = SchemaFactory.createForClass(Balance);
