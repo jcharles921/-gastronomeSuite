@@ -7,19 +7,27 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Order } from 'src/model';
-import { OrderDto, OrderUpdateDto } from 'src/dto';
+import { Order,BalanceHistory} from 'src/model';
+
+import { OrderDto, OrderUpdateDto} from 'src/dto';
 
 @Injectable()
 export class OrderService {
-  constructor(@InjectModel(Order.name) private orderModel: Model<Order>) {}
+  constructor(
+    @InjectModel(Order.name) private orderModel: Model<Order>,
+    @InjectModel(BalanceHistory.name) private balanceModel: Model<BalanceHistory>,
+  ) {}
   async createOrder(orderInfo: OrderDto): Promise<Order> {
     const { clientName, totalToBePaid, status, orderDetails, user } = orderInfo;
     try {
-      const findOrder = await this.orderModel.findOne({ clientName, status: 'pending' });
+      const findOrder = await this.orderModel.findOne({
+        clientName,
+        status: 'pending',
+      });
       if (findOrder) {
         throw new ConflictException('Order already exists');
       }
+      if(status === 'paid'){
       const order = await this.orderModel.create({
         clientName,
         totalToBePaid,
@@ -27,6 +35,20 @@ export class OrderService {
         orderDetails,
         user,
       });
+       await this.balanceModel.create({
+        amount: totalToBePaid,
+        transactionType: "Depot",
+        transaction: order,
+      })
+      return order;
+    }
+    const order = await this.orderModel.create({
+      clientName,
+      totalToBePaid,
+      status,
+      orderDetails,
+      user,
+    });
       return order;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -53,11 +75,30 @@ export class OrderService {
     }
   }
   async updateOrder(id: string, orderInfo: OrderUpdateDto): Promise<Order> {
-    const { totalToBePaid, status, orderDetails, user,clientName } = orderInfo;
+    const { totalToBePaid, status, orderDetails, user, clientName } = orderInfo;
     try {
       const order = await this.orderModel.findById(id);
       if (!order) {
         throw new NotFoundException('Order not found');
+      }
+      if(status === 'paid'){
+        const updatedOrder = await this.orderModel.findByIdAndUpdate(
+          id,
+          {
+            clientName,
+            totalToBePaid,
+            status,
+            orderDetails,
+            user,
+          },
+          { new: true },
+        );
+        await this.balanceModel.create({
+          amount: totalToBePaid,
+          transactionType: "Depot",
+          transaction: orderInfo,
+        })
+        return updatedOrder;
       }
       const updatedOrder = await this.orderModel.findByIdAndUpdate(
         id,

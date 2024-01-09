@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsArray, IsNumber, IsInt, IsObject } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsArray,
+  IsNumber,
+  IsInt,
+  IsObject,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 class OrderDetailDto {

@@ -5,7 +5,6 @@ import mongoose, { Document } from 'mongoose';
   timestamps: true,
 })
 export class Order {
-  
   @Prop()
   totalToBePaid: number;
 
@@ -33,10 +32,12 @@ export class Order {
   @Prop({ type: mongoose.Types.ObjectId, ref: 'User' })
   user: string;
 
-  @Prop([{
-    productId: { type: mongoose.Types.ObjectId, ref: 'Product' },
-    quantity: { type: Number, default: 1 }, 
-  }])
+  @Prop([
+    {
+      productId: { type: mongoose.Types.ObjectId, ref: 'Product' },
+      quantity: { type: Number, default: 1 },
+    },
+  ])
   orderDetails: { productId: string; quantity: number }[];
 }
 
