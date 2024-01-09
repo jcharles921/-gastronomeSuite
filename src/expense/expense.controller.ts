@@ -17,7 +17,10 @@ import {
   } from '@nestjs/swagger';
 import { ExpenseService } from './expense.service';
 import { ExpenseDto } from 'src/dto';
+import { IsUserGuard } from 'src/guards';
 
+@ApiBearerAuth()
+@UseGuards(IsUserGuard)
 @ApiTags("Expense")
 @Controller('expense')
 export class ExpenseController {

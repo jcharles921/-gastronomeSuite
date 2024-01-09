@@ -4,15 +4,25 @@ import mongoose, { Document } from 'mongoose';
 @Schema({
   timestamps: true,
 })
-export class Balance {
+// TRANSACTION HISTORY
+export class BalanceHistory extends Document {
   @Prop({
     type: Number,
     default: 0,
   })
-  total: number;
+  amount: number;
 
-  @Prop()
-  history: [];
+  @Prop({
+    type: mongoose.Schema.Types.Mixed,
+    default: {},
+  }
+  )
+  transaction: {};
+  @Prop({
+    type: String,
+    enum: ['Depot', 'Retrait'],
+  })
+  transactionType:string
   @Prop({
     type: String,
     enum: ['Herbergement', 'Restauration'],
@@ -26,4 +36,4 @@ export class Balance {
   updatedAt: Date;
 }
 
-export const BalanceSchema = SchemaFactory.createForClass(Balance);
+export const BalanceSchema = SchemaFactory.createForClass(BalanceHistory);

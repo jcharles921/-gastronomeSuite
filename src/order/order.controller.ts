@@ -19,8 +19,8 @@ import { OrderService } from './order.service';
 import { OrderDto } from 'src/dto';
 import { IsUserGuard } from 'src/guards';
 
-@ApiBearerAuth()
 @ApiTags('Order')
+@ApiBearerAuth()
 @UseGuards(IsUserGuard)
 @Controller('order')
 export class OrderController {

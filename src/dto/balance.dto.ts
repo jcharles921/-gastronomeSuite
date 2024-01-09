@@ -4,10 +4,11 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UpdateBalanceDto {
   @ApiProperty()
   @IsInt()
-  total: number;
+  amount: number;
   @ApiProperty()
   @IsString()
-  history: [];
+  // Order or Expense
+  transaction: {};
   @ApiProperty()
   @IsString()
   type: string;

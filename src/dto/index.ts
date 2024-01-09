@@ -3,6 +3,7 @@ import { LoginDto } from './login.dto';
 import { ProductDto, ProductUpdateDto } from './product.dto';
 import { OrderDto, OrderUpdateDto } from './order.dto';
 import { ExpenseDto, ExpenseUpdateDto } from './expense.dto';
+import { UpdateBalanceDto } from './balance.dto';
 
 export {
   SignUpDto,
@@ -12,5 +13,6 @@ export {
   OrderDto,
   OrderUpdateDto,
   ExpenseDto,
-  ExpenseUpdateDto
+  ExpenseUpdateDto,
+  UpdateBalanceDto,
 };

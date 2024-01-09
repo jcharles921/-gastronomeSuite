@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { BalanceService } from './balance.service';
 import {
   ApiTags,
@@ -6,7 +6,10 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { IsUserGuard } from 'src/guards';
 
+@ApiBearerAuth()
+@UseGuards(IsUserGuard)
 @ApiTags('Balance')
 @Controller('balance/resto')
 export class BalanceController {

@@ -2,13 +2,15 @@ import { Module } from '@nestjs/common';
 import { BalanceController } from './balance.controller';
 import { BalanceService } from './balance.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Balance, BalanceSchema } from 'src/model/balance.schema';
+import { BalanceHistory, BalanceSchema } from 'src/model/balance.schema';
 import { Order, OrderSchema } from 'src/model/order.schema';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Balance.name, schema: BalanceSchema }]),
+    MongooseModule.forFeature([{ name: BalanceHistory.name, schema: BalanceSchema }]),
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
+    AuthModule,
   ],
   controllers: [BalanceController],
   providers: [BalanceService],

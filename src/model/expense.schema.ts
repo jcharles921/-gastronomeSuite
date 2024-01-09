@@ -5,7 +5,10 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
   timestamps: true,
 })
 export class Expense {
-
+  @Prop(
+    { type: MongooseSchema.Types.ObjectId, ref: 'User' },
+  )
+  user: string;
   @Prop()
   amount: number;
   @Prop()

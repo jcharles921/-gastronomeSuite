@@ -4,6 +4,10 @@ import { ApiProperty } from '@nestjs/swagger';
 export class ExpenseDto {
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
+  user: string;
+  @ApiProperty()
+  @IsString()
   description: string;
   @ApiProperty()
   @IsInt()
@@ -22,7 +26,10 @@ export class ExpenseDto {
 }
 
 export class ExpenseUpdateDto {
-
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  user: string;
   @ApiProperty()
   @IsString()
   description: string;

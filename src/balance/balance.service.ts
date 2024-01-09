@@ -7,28 +7,29 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Balance, Order } from 'src/model/';
+import { BalanceHistory, Order } from 'src/model/';
 
 @Injectable()
 export class BalanceService {
   constructor(
-    @InjectModel(Balance.name) private balanceModel: Model<Balance>,
-    @InjectModel(Order.name) private orderModel: Model<Order>,
+    @InjectModel(BalanceHistory.name) private balanceModel: Model<BalanceHistory>,
   ) {}
-  async getBalance(): Promise<{ total; history }> {
+  async getBalance(): Promise<{ total:Number}> {
     try {
-      const balance = await this.balanceModel.find({});
-      const orders = await this.orderModel.find({ status: 'paid' });
+      const balance = await this.balanceModel.find({},'amount transactionType');
+      if (!balance) {
+        throw new NotFoundException('Balance not found');
+      }
+      const allRetrait = balance
+  .filter((entry) => entry.transactionType === 'Retrait')
+  .reduce((totalRetrait, entry) => totalRetrait + entry.amount, 0);
 
-      const sortedOrders = orders.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-      const solde = sortedOrders
-        .map((order) => order.totalToBePaid)
-        .reduce((a, b) => a + b, 0);
+const allDepot = balance
+  .filter((entry) => entry.transactionType === 'Depot')
+  .reduce((totalDepot, entry) => totalDepot + entry.amount, 0);
 
-      return { total: solde, history: sortedOrders };
+const solde = allDepot - allRetrait;
+      return { total: solde };
     } catch (error) {
       throw new BadRequestException(error.message);
     }

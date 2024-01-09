@@ -2,50 +2,43 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   BadRequestException,
-  ConflictException,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Expense,Balance } from 'src/model';
+import { Expense,BalanceHistory} from 'src/model';
 import { ExpenseDto,ExpenseUpdateDto } from 'src/dto';
 
 @Injectable()
 export class ExpenseService {
   constructor(
     @InjectModel(Expense.name) private expenseModel: Model<Expense>,
-    @InjectModel(Balance.name) private balanceModel: Model<Balance>,
+    @InjectModel(BalanceHistory.name) private balanceModel: Model<BalanceHistory>,
   ) {}
   async getAllExpenses(): Promise<Expense[]> {
     try {
       const expense = await this.expenseModel.find({});
       return expense;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
   async createExpense( expenseInfo:ExpenseDto): Promise<Expense> {
     const { description, amount,product  } = expenseInfo;
     try {
-    const balance = await this.balanceModel.find({});
-    if (!balance) {
-        throw new NotFoundException('Balance not found');
-    }
-    if (balance.total < amount) {
-        throw new BadRequestException('Not enough balance');
-    }
       const expense = await this.expenseModel.create({
         description,
         amount,
         product,
       });
-        const updatedBalance = await this.balanceModel.findOneAndUpdate(
-            { name: "balance" },
-            { $inc: { total: -amount } },
-            { new: true }
-        );
+      await this.balanceModel.create({
+        amount: amount,
+        transactionType: "Retrait",
+        transaction: expense,
+      })
       return expense;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
     async getSingleExpense(id: string): Promise<Expense> {
@@ -56,7 +49,7 @@ export class ExpenseService {
         }
         return expense;
         } catch (error) {
-        throw new BadRequestException(error.message);
+          throw new InternalServerErrorException(error.message);
         }
     }
     async updateExpense(
@@ -66,8 +59,25 @@ export class ExpenseService {
         const { description, amount, product } = expenseInfo;
         try {
         const expense = await this.expenseModel.findById(id);
+   
         if (!expense) {
             throw new NotFoundException('Expense not found');
+        }
+        // IF THE UPDATED AMOUNT IS LESS THAN THE AMOUNT IN THE DB
+        if(expense.amount > amount){
+          await this.balanceModel.create({
+            amount: expense.amount - amount,
+            transactionType: "Depot",
+            transaction: expense,
+          })
+        }
+        // IF THE UPDATED AMOUNT IS GREATER THAN THE AMOUNT IN THE DB
+        else if(expense.amount < amount){
+          await this.balanceModel.create({
+            amount: amount - expense.amount,
+            transactionType: "Retrait",
+            transaction: expense,
+          })
         }
         const updatedExpense = await this.expenseModel.findByIdAndUpdate(
             id,
@@ -80,11 +90,11 @@ export class ExpenseService {
         );
         return updatedExpense;
         } catch (error) {
-        throw new BadRequestException(error.message);
+          throw new InternalServerErrorException(error.message);
         }
     }
 
-    async deleteExpense(id: string): Promise<{ message: string; newBalance: number }> {
+    async deleteExpense(id: string): Promise<{ message: string}> {
         try {
             // Find the expense first to get the amount
             const expense = await this.expenseModel.findById(id);
@@ -92,29 +102,15 @@ export class ExpenseService {
             if (!expense) {
                 throw new NotFoundException('Expense not found');
             }
+            await this.balanceModel.create({
+              amount: expense.amount,
+              transactionType: "Depot",
+              transaction: expense,
+            })
     
-            // Save the amount to be re-added to the balance
-            const toReAdd = expense.amount;
-    
-            // Delete the expense
-            await this.expenseModel.findByIdAndDelete(id);
-    
-            // Update the balance by incrementing the total with the amount to be re-added
-            const updatedBalance = await this.balanceModel.findOneAndUpdate(
-                { name: "balance" },
-                { $inc: { total: toReAdd } },
-                { new: true }
-            );
-    
-            if (!updatedBalance) {
-                // Handle the case when the balance document is not found
-                throw new NotFoundException('Balance not found');
-            }
-    
-            return { message: 'Expense deleted successfully', newBalance: updatedBalance.total };
+            return { message: 'Expense deleted successfully'};
         } catch (error) {
-            // Use a more specific exception type, such as InternalServerError, for unexpected errors
-            throw new BadRequestException(error.message);
+            throw new InternalServerErrorException(error.message);
         }
     }
     
