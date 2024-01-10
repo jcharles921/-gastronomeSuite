@@ -7,6 +7,7 @@ import { ProductModule } from './product/product.module';
 import { BalanceModule } from './balance/balance.module';
 import { ExpenseModule } from './expense/expense.module';
 import { CategoryModule } from './category/category.module';
+import { UserModule } from './user/user.module';
 
 
 @Module({
@@ -21,6 +22,7 @@ import { CategoryModule } from './category/category.module';
     BalanceModule,
     ExpenseModule,
     CategoryModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],
