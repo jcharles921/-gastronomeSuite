@@ -12,6 +12,15 @@ export class ExpenseDto {
   @ApiProperty()
   @IsInt()
   amount: number;
+  @ApiProperty(
+    {
+        description: 'The list of the categories in the Expense',
+        type: String,
+    },
+  )
+  @IsString()
+  category: string;
+
   @ApiProperty()
   @IsArray()
   @IsNotEmpty()
@@ -30,6 +39,14 @@ export class ExpenseUpdateDto {
   @IsString()
   @IsNotEmpty()
   user: string;
+  @ApiProperty(
+    {
+        description: 'The list of the categories in the Expense',
+        type: String,
+    },
+  )
+  @IsString()
+  category: string;
   @ApiProperty()
   @IsString()
   description: string;

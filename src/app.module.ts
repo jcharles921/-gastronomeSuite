@@ -4,10 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { ProductModule } from './product/product.module';
-import { BalanceController } from './balance/balance.controller';
-import { BalanceService } from './balance/balance.service';
 import { BalanceModule } from './balance/balance.module';
 import { ExpenseModule } from './expense/expense.module';
+import { CategoryModule } from './category/category.module';
+
 
 @Module({
   imports: [
@@ -20,6 +20,7 @@ import { ExpenseModule } from './expense/expense.module';
     ProductModule,
     BalanceModule,
     ExpenseModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],
