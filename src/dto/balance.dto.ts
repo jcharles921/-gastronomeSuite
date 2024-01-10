@@ -12,5 +12,6 @@ export class UpdateBalanceDto {
   @ApiProperty()
   @IsString()
   type: string;
+  
 
 }

@@ -13,6 +13,8 @@ export class Expense {
   amount: number;
   @Prop()
   description: string;
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Category' }] })
+  category: string;
   @Prop({
     type: String,
     enum: ['Herbergement', 'Transport', 'Restauration', 'Autres'],

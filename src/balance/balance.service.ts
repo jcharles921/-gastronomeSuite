@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { BalanceHistory, Order } from 'src/model/';
+import { BalanceHistory } from 'src/model/';
 
 @Injectable()
 export class BalanceService {
@@ -30,6 +30,18 @@ const allDepot = balance
 
 const solde = allDepot - allRetrait;
       return { total: solde };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async addBalance(amount: number): Promise<BalanceHistory> {
+    try {
+      const balance = await this.balanceModel.create({
+        amount: amount,
+        transactionType: 'Depot',
+      });
+      return balance;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

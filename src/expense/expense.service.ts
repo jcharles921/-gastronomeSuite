@@ -24,7 +24,7 @@ export class ExpenseService {
     }
   }
   async createExpense( expenseInfo:ExpenseDto): Promise<Expense> {
-    const { description, amount,product  } = expenseInfo;
+    const { description, amount,product,category } = expenseInfo;
     try {
       const expense = await this.expenseModel.create({
         description,
@@ -34,7 +34,7 @@ export class ExpenseService {
       await this.balanceModel.create({
         amount: amount,
         transactionType: "Retrait",
-        transaction: expense,
+        transaction: {expense,category}
       })
       return expense;
     } catch (error) {
@@ -56,7 +56,7 @@ export class ExpenseService {
         id: string,
         expenseInfo: ExpenseUpdateDto,
     ): Promise<Expense> {
-        const { description, amount, product } = expenseInfo;
+        const { description, amount, product,category } = expenseInfo;
         try {
         const expense = await this.expenseModel.findById(id);
    
@@ -68,7 +68,7 @@ export class ExpenseService {
           await this.balanceModel.create({
             amount: expense.amount - amount,
             transactionType: "Depot",
-            transaction: expense,
+            transaction: {expense,category}
           })
         }
         // IF THE UPDATED AMOUNT IS GREATER THAN THE AMOUNT IN THE DB
@@ -76,7 +76,7 @@ export class ExpenseService {
           await this.balanceModel.create({
             amount: amount - expense.amount,
             transactionType: "Retrait",
-            transaction: expense,
+            transaction: {expense,category}
           })
         }
         const updatedExpense = await this.expenseModel.findByIdAndUpdate(
@@ -94,6 +94,8 @@ export class ExpenseService {
         }
     }
 
+    // NOTE THAT THE BALANCE IS UPDATED WHEN THE EXPENSE IS DELETED 
+    // I WILL FIX THE CATEGORY ISSUE LATER
     async deleteExpense(id: string): Promise<{ message: string}> {
         try {
             // Find the expense first to get the amount
