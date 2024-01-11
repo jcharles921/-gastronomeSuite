@@ -58,7 +58,7 @@ export class OrderController {
   @Put('/:id')
   @ApiOperation({ summary: 'Update an order' })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'The order has been successfully updated.',
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })

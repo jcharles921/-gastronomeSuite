@@ -5,9 +5,7 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
   timestamps: true,
 })
 export class Expense {
-  @Prop(
-    { type: MongooseSchema.Types.ObjectId, ref: 'User' },
-  )
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   user: string;
   @Prop()
   amount: number;
@@ -28,7 +26,6 @@ export class Expense {
   updatedAt: Date;
   @Prop({ type: Date, default: null })
   deletedAt: Date;
- 
 }
 
 export const ExpenseSchema = SchemaFactory.createForClass(Expense);

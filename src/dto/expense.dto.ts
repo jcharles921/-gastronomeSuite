@@ -1,4 +1,4 @@
-import { IsString, IsInt,IsNotEmpty,IsArray} from 'class-validator';
+import { IsString, IsInt, IsNotEmpty, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ExpenseDto {
@@ -12,12 +12,10 @@ export class ExpenseDto {
   @ApiProperty()
   @IsInt()
   amount: number;
-  @ApiProperty(
-    {
-        description: 'The list of the categories in the Expense',
-        type: String,
-    },
-  )
+  @ApiProperty({
+    description: 'The list of the categories in the Expense',
+    type: String,
+  })
   @IsString()
   category: string;
 
@@ -25,13 +23,12 @@ export class ExpenseDto {
   @IsArray()
   @IsNotEmpty()
   type: string[];
-    @ApiProperty({
-        description: 'The list of the products in the Expense',
-        type: [String],
-    })
-    @IsArray()
-
-    product: string[];
+  @ApiProperty({
+    description: 'The list of the products in the Expense',
+    type: [String],
+  })
+  @IsArray()
+  product: string[];
 }
 
 export class ExpenseUpdateDto {
@@ -39,12 +36,10 @@ export class ExpenseUpdateDto {
   @IsString()
   @IsNotEmpty()
   user: string;
-  @ApiProperty(
-    {
-        description: 'The list of the categories in the Expense',
-        type: String,
-    },
-  )
+  @ApiProperty({
+    description: 'The list of the categories in the Expense',
+    type: String,
+  })
   @IsString()
   category: string;
   @ApiProperty()
@@ -56,11 +51,10 @@ export class ExpenseUpdateDto {
   @ApiProperty()
   @IsString()
   type: string[];
-    @ApiProperty({
-        description: 'The list of the products in the Expense',
-        type: [String],
-    })
-    @IsString()
+  @ApiProperty({
+    description: 'The list of the products in the Expense',
+    type: [String],
+  })
+  @IsString()
   product: string[];
-
 }

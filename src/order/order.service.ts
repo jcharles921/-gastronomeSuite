@@ -1,21 +1,22 @@
 import {
   Injectable,
   ConflictException,
-  // InternalServerErrorException,
+  InternalServerErrorException,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Order,BalanceHistory} from 'src/model';
-
-import { OrderDto, OrderUpdateDto} from 'src/dto';
+import { Order, BalanceHistory, Product } from 'src/model';
+import { OrderDto, OrderUpdateDto, OrderDetailDto } from 'src/dto';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
-    @InjectModel(BalanceHistory.name) private balanceModel: Model<BalanceHistory>,
+    @InjectModel(BalanceHistory.name)
+    private balanceModel: Model<BalanceHistory>,
+    @InjectModel(Product.name) private productModel: Model<Product>,
   ) {}
   async createOrder(orderInfo: OrderDto): Promise<Order> {
     const { clientName, totalToBePaid, status, orderDetails, user } = orderInfo;
@@ -27,7 +28,32 @@ export class OrderService {
       if (findOrder) {
         throw new ConflictException('Order already exists');
       }
-      if(status === 'paid'){
+      await Promise.all(orderDetails.map(async (element: OrderDetailDto) => {
+        const product = await this.productModel.findById(element.productId);
+        if (!product) {
+          throw new NotFoundException('Product not found');
+        }
+        if (product.quantity < element.quantity) {
+          throw new BadRequestException(
+            `The quantity of ${product.name} is not enough`,
+          );
+        }
+      }));
+      if (status === 'paid') {
+        const order = await this.orderModel.create({
+          clientName,
+          totalToBePaid,
+          status,
+          orderDetails,
+          user,
+        });
+        await this.balanceModel.create({
+          amount: totalToBePaid,
+          transactionType: 'Depot',
+          transaction: order,
+        });
+        return order;
+      }
       const order = await this.orderModel.create({
         clientName,
         totalToBePaid,
@@ -35,31 +61,20 @@ export class OrderService {
         orderDetails,
         user,
       });
-       await this.balanceModel.create({
-        amount: totalToBePaid,
-        transactionType: "Depot",
-        transaction: order,
-      })
-      return order;
-    }
-    const order = await this.orderModel.create({
-      clientName,
-      totalToBePaid,
-      status,
-      orderDetails,
-      user,
-    });
       return order;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
   async getAllOrders(): Promise<Order[]> {
     try {
       const orders = await this.orderModel.find({});
+      if (!orders) {
+        throw new NotFoundException('Order not found');
+      }
       return orders;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -71,7 +86,7 @@ export class OrderService {
       }
       return order;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
   async updateOrder(id: string, orderInfo: OrderUpdateDto): Promise<Order> {
@@ -81,7 +96,18 @@ export class OrderService {
       if (!order) {
         throw new NotFoundException('Order not found');
       }
-      if(status === 'paid'){
+      if (status === 'paid') {
+        await Promise.all(orderDetails.map(async (element: OrderDetailDto) => {
+          const product = await this.productModel.findById(element.productId);
+          if (!product) {
+            throw new NotFoundException('Product not found');
+          }
+          if (product.quantity < element.quantity) {
+            throw new BadRequestException(
+              `The quantity of ${product.name} is not enough`,
+            );
+          }
+        }));
         const updatedOrder = await this.orderModel.findByIdAndUpdate(
           id,
           {
@@ -95,9 +121,9 @@ export class OrderService {
         );
         await this.balanceModel.create({
           amount: totalToBePaid,
-          transactionType: "Depot",
+          transactionType: 'Depot',
           transaction: orderInfo,
-        })
+        });
         return updatedOrder;
       }
       const updatedOrder = await this.orderModel.findByIdAndUpdate(
@@ -113,7 +139,7 @@ export class OrderService {
       );
       return updatedOrder;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
   async deleteOrder(id: string): Promise<{ message: string }> {
@@ -124,7 +150,7 @@ export class OrderService {
       }
       return { message: 'Order deleted successfully' };
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

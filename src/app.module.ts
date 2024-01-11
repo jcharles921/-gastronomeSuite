@@ -9,7 +9,6 @@ import { ExpenseModule } from './expense/expense.module';
 import { CategoryModule } from './category/category.module';
 import { UserModule } from './user/user.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({

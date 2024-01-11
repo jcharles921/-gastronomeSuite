@@ -15,14 +15,13 @@ export class BalanceHistory extends Document {
   @Prop({
     type: mongoose.Schema.Types.Mixed,
     default: {},
-  }
-  )
+  })
   transaction: {};
   @Prop({
     type: String,
     enum: ['Depot', 'Retrait'],
   })
-  transactionType:string
+  transactionType: string;
   @Prop({
     type: String,
     enum: ['Herbergement', 'Restauration'],
