@@ -4,11 +4,15 @@ import {
   // InternalServerErrorException,
   NotFoundException,
   BadRequestException,
+  InternalServerErrorException,
+  Header,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BalanceHistory } from 'src/model/';
-import { write, utils, WorkBook } from 'xlsx';
+import { write, utils,writeFile } from 'xlsx';
 
 @Injectable()
 export class BalanceService {
@@ -16,10 +20,11 @@ export class BalanceService {
     @InjectModel(BalanceHistory.name)
     private balanceModel: Model<BalanceHistory>,
   ) {}
+  
   async getBalance(): Promise<{ total: Number; details }> {
     try {
       const tst = await this.balanceModel.find({});
-      console.log(tst);
+
       const balance = await this.balanceModel.find(
         {},
         'amount transactionType',
@@ -30,6 +35,7 @@ export class BalanceService {
       const allRetrait = balance
         .filter((entry) => entry.transactionType === 'Retrait')
         .reduce((totalRetrait, entry) => totalRetrait + entry.amount, 0);
+     
 
       const allDepot = balance
         .filter((entry) => entry.transactionType === 'Depot')
@@ -53,35 +59,68 @@ export class BalanceService {
       throw new BadRequestException(error.message);
     }
   }
-  async getExcelBalance(): Promise<String> {
+  @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+  @Header('Content-Disposition', 'attachment; filename=amicizia.xlsx')
+  
+  async getExcelBalance(@Res() res: Response): Promise<any> {
     try {
       const RowData = await this.balanceModel.find({});
 
-      const data = RowData.map((row: any) => {
+
+      const data = RowData.map((row: any, index: number, array: any[]) => {
         var inpuNumber = row.transaction.inputationNumber;
-        var originalDate = row.createdAt;
-        const formattedDate = new Date(originalDate).toLocaleString();
+        
+        const formattedDate =  row.createdAt.toLocaleDateString('fr-FR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      
+        // Initialize balance variable to store the running total
+        let balance = index > 0 ? array[index - 1].solde : 0;
+      
         if (row.transactionType === 'Depot') {
+
+          balance += row.amount;
+      
           return {
             date: formattedDate,
-            description: row.transaction,
+            description: "Recettes",
             imputationNumber: '71520',
             depot: row.amount,
             retrait: '',
-            solde: row.amount,
+            solde: balance,
           };
         }
-        return {
-          date: formattedDate,
-          description: row.transaction,
-          imputationNumber: row._id,
-          depot: row.transactionType === 'Depot' ? row.amount : '',
-          retrait: row.transactionType === 'Retrait' ? row.amount : '',
-          solde: row.amount,
-        };
+      
+        if(row.transactionType === 'Retrait'){
+          
+          balance -= row.amount;
+          return {
+            date: formattedDate,
+            description: "Dépenses",
+            imputationNumber: inpuNumber,
+            depot: row.transactionType === 'Depot' ? row.amount : '',
+            retrait: row.transactionType === 'Retrait' ? row.amount : '',
+            solde: balance,
+          };
+        }
       });
-      return 'data';
-      //DATE, Description,Imputation Number,Depot, retrait, solde
-    } catch (error) {}
+      
+      const workSheet = utils.json_to_sheet(data);
+      const workBook = utils.book_new();
+      utils.book_append_sheet(workBook, workSheet, 'Balance');
+      utils.sheet_add_aoa(workSheet, [
+        ['Date', 'Description', 'Imputation', 'Depot', 'Retrait', 'Solde'],
+      ], { origin: 'A1' });
+      writeFile(workBook, 'amicizia.xlsx',{compression:true});
+      res.download('amicizia.xlsx');
+    
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+
+    }
   }
 }

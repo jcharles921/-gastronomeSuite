@@ -43,6 +43,7 @@ export class OrderService {
         const order = await this.orderModel.create({
           clientName,
           totalToBePaid,
+          description: "Paid Order",
           status,
           orderDetails,
           user,
@@ -50,7 +51,7 @@ export class OrderService {
         await this.balanceModel.create({
           amount: totalToBePaid,
           transactionType: 'Depot',
-          transaction: order,
+          transaction: {order,inputationNumber: '71520'},
         });
         return order;
       }
@@ -107,24 +108,37 @@ export class OrderService {
               `The quantity of ${product.name} is not enough`,
             );
           }
+          
         }));
         const updatedOrder = await this.orderModel.findByIdAndUpdate(
           id,
           {
             clientName,
             totalToBePaid,
+            description: "Updating Paid Order",
             status,
             orderDetails,
             user,
           },
           { new: true },
         );
+       if (!updatedOrder) {
+         throw new NotFoundException('Order not found');
+       }
+       if(totalToBePaid > order.totalToBePaid){
         await this.balanceModel.create({
-          amount: totalToBePaid,
+          amount: totalToBePaid - order.totalToBePaid,
           transactionType: 'Depot',
-          transaction: orderInfo,
+          transaction: {updatedOrder,inputationNumber: '71520'},
         });
-        return updatedOrder;
+       }
+       else if (totalToBePaid < order.totalToBePaid) {
+        await this.balanceModel.create({
+          amount: order.totalToBePaid - totalToBePaid,
+          transactionType: 'Retrait',
+          transaction: {updatedOrder,inputationNumber: '71520'},
+        });
+       }
       }
       const updatedOrder = await this.orderModel.findByIdAndUpdate(
         id,
@@ -137,7 +151,11 @@ export class OrderService {
         },
         { new: true },
       );
+     if (!updatedOrder) {
+       throw new NotFoundException('Order not found');
+     }
       return updatedOrder;
+
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
