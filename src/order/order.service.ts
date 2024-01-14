@@ -28,22 +28,24 @@ export class OrderService {
       if (findOrder) {
         throw new ConflictException('Order already exists');
       }
-      await Promise.all(orderDetails.map(async (element: OrderDetailDto) => {
-        const product = await this.productModel.findById(element.productId);
-        if (!product) {
-          throw new NotFoundException('Product not found');
-        }
-        if (product.quantity < element.quantity) {
-          throw new BadRequestException(
-            `The quantity of ${product.name} is not enough`,
-          );
-        }
-      }));
+      await Promise.all(
+        orderDetails.map(async (element: OrderDetailDto) => {
+          const product = await this.productModel.findById(element.productId);
+          if (!product) {
+            throw new NotFoundException('Product not found');
+          }
+          if (product.quantity < element.quantity) {
+            throw new BadRequestException(
+              `The quantity of ${product.name} is not enough`,
+            );
+          }
+        }),
+      );
       if (status === 'paid') {
         const order = await this.orderModel.create({
           clientName,
           totalToBePaid,
-          description: "Paid Order",
+          description: 'Paid Order',
           status,
           orderDetails,
           user,
@@ -51,7 +53,7 @@ export class OrderService {
         await this.balanceModel.create({
           amount: totalToBePaid,
           transactionType: 'Depot',
-          transaction: {order,inputationNumber: '71520'},
+          transaction: { order, inputationNumber: '71520' },
         });
         return order;
       }
@@ -98,47 +100,47 @@ export class OrderService {
         throw new NotFoundException('Order not found');
       }
       if (status === 'paid') {
-        await Promise.all(orderDetails.map(async (element: OrderDetailDto) => {
-          const product = await this.productModel.findById(element.productId);
-          if (!product) {
-            throw new NotFoundException('Product not found');
-          }
-          if (product.quantity < element.quantity) {
-            throw new BadRequestException(
-              `The quantity of ${product.name} is not enough`,
-            );
-          }
-          
-        }));
+        await Promise.all(
+          orderDetails.map(async (element: OrderDetailDto) => {
+            const product = await this.productModel.findById(element.productId);
+            if (!product) {
+              throw new NotFoundException('Product not found');
+            }
+            if (product.quantity < element.quantity) {
+              throw new BadRequestException(
+                `The quantity of ${product.name} is not enough`,
+              );
+            }
+          }),
+        );
         const updatedOrder = await this.orderModel.findByIdAndUpdate(
           id,
           {
             clientName,
             totalToBePaid,
-            description: "Updating Paid Order",
+            description: 'Updating Paid Order',
             status,
             orderDetails,
             user,
           },
           { new: true },
         );
-       if (!updatedOrder) {
-         throw new NotFoundException('Order not found');
-       }
-       if(totalToBePaid > order.totalToBePaid){
-        await this.balanceModel.create({
-          amount: totalToBePaid - order.totalToBePaid,
-          transactionType: 'Depot',
-          transaction: {updatedOrder,inputationNumber: '71520'},
-        });
-       }
-       else if (totalToBePaid < order.totalToBePaid) {
-        await this.balanceModel.create({
-          amount: order.totalToBePaid - totalToBePaid,
-          transactionType: 'Retrait',
-          transaction: {updatedOrder,inputationNumber: '71520'},
-        });
-       }
+        if (!updatedOrder) {
+          throw new NotFoundException('Order not found');
+        }
+        if (totalToBePaid > order.totalToBePaid) {
+          await this.balanceModel.create({
+            amount: totalToBePaid - order.totalToBePaid,
+            transactionType: 'Depot',
+            transaction: { updatedOrder, inputationNumber: '71520' },
+          });
+        } else if (totalToBePaid < order.totalToBePaid) {
+          await this.balanceModel.create({
+            amount: order.totalToBePaid - totalToBePaid,
+            transactionType: 'Retrait',
+            transaction: { updatedOrder, inputationNumber: '71520' },
+          });
+        }
       }
       const updatedOrder = await this.orderModel.findByIdAndUpdate(
         id,
@@ -151,11 +153,10 @@ export class OrderService {
         },
         { new: true },
       );
-     if (!updatedOrder) {
-       throw new NotFoundException('Order not found');
-     }
+      if (!updatedOrder) {
+        throw new NotFoundException('Order not found');
+      }
       return updatedOrder;
-
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
