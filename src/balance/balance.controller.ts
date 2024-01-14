@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards,Res } from '@nestjs/common';
 import { BalanceService } from './balance.service';
 import {
   ApiTags,
@@ -7,7 +7,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { IsUserGuard } from 'src/guards';
-
+import { Response } from 'express';
 @ApiBearerAuth()
 @UseGuards(IsUserGuard)
 @ApiTags('Balance')
@@ -23,5 +23,9 @@ export class BalanceController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async getBalance() {
     return await this.balanceService.getBalance();
+  }
+  @Get('/excel')
+  async getExcelBalance(@Res() res: Response) {
+    return await this.balanceService.getExcelBalance( res);
   }
 }

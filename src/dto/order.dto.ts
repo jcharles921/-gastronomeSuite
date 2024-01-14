@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-class OrderDetailDto {
+export class OrderDetailDto {
   @ApiProperty({
     description: 'The product ID',
     type: String,
@@ -47,6 +47,9 @@ export class OrderDto {
   @IsArray()
   @IsNotEmpty()
   orderDetails: OrderDetailDto[];
+  @ApiProperty()
+  @IsString()
+  description: string;
 
   @ApiProperty({
     description: 'The Employee who took the command',
