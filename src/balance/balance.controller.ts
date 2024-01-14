@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards,Res } from '@nestjs/common';
+import { Controller, Get, UseGuards, Res } from '@nestjs/common';
 import { BalanceService } from './balance.service';
 import {
   ApiTags,
@@ -26,6 +26,6 @@ export class BalanceController {
   }
   @Get('/excel')
   async getExcelBalance(@Res() res: Response) {
-    return await this.balanceService.getExcelBalance( res);
+    return await this.balanceService.getExcelBalance(res);
   }
 }
