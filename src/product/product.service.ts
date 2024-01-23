@@ -57,21 +57,25 @@ export class ProductService {
   async updateProduct(
     id: string,
     productInfo: ProductUpdateDto,
-  ): Promise<Product> {
+  ): Promise<{ message: String; updatedProduct: any }> {
     const { name, description, price, category, quantity, image } = productInfo;
     try {
       const product = await this.productModel.findById(id);
       if (!product) {
         throw new NotFoundException('Product not found');
       }
-      product.name = name;
-      product.description = description;
-      product.price = price;
-      product.category = category;
-      product.quantity = quantity;
-      product.image = image;
-      await product.save();
-      return product;
+      const updateProduct = await this.productModel.findByIdAndUpdate(id, {
+        name,
+        description,
+        price,
+        category,
+        quantity,
+        image,
+      });
+      return {
+        message: 'Product Successfully Updated ',
+        updatedProduct: updateProduct,
+      };
     } catch (error) {
       throw new BadRequestException(error.message);
     }

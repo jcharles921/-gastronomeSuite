@@ -16,7 +16,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ProductService } from './product.service';
-import { ProductDto } from 'src/dto';
+import { ProductDto, ProductUpdateDto } from 'src/dto';
 import { IsUserGuard } from 'src/guards';
 
 @ApiBearerAuth()
@@ -64,7 +64,7 @@ export class ProductController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async updateProduct(
-    @Body(ValidationPipe) productInfo: ProductDto,
+    @Body(ValidationPipe) productInfo: ProductUpdateDto,
     @Param('id') id: string,
   ) {
     return await this.productService.updateProduct(id, productInfo);

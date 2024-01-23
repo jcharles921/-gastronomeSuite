@@ -32,7 +32,6 @@ export class ProductDto {
 
 export class ProductUpdateDto {
   @ApiProperty({ description: 'The name of the product', type: String })
-  @IsString()
   name: string;
 
   @ApiProperty({ description: 'The price of the product', type: Number })
@@ -45,10 +44,8 @@ export class ProductUpdateDto {
   quantity: number;
 
   @ApiProperty({ description: 'The description of the product', type: String })
-  @IsString()
   description: string;
 
   @ApiProperty({ description: 'The image of the product', type: String })
-  @IsString()
   image: string;
 }

@@ -6,7 +6,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { IsUserGuard } from 'src/guards';
+import { IsUserGuard, IsAdminGuard } from 'src/guards';
 import { Response } from 'express';
 @ApiBearerAuth()
 @UseGuards(IsUserGuard)
@@ -24,6 +24,7 @@ export class BalanceController {
   async getBalance() {
     return await this.balanceService.getBalance();
   }
+  @UseGuards(IsAdminGuard)
   @Get('/excel')
   async getExcelBalance(@Res() res: Response) {
     return await this.balanceService.getExcelBalance(res);
